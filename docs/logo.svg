@@ -1,0 +1,8 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="320" rx="24" fill="#F7EFE6"/>
+
+  <rect x="112" y="72" width="272" height="56" fill="#7A4A2A"/>
+  <rect x="136" y="128" width="224" height="160" fill="#8B5E3C"/>
+
+  <text x="450" y="210" fill="#5C3B24" font-family="'Arial Black', 'Impact', sans-serif" font-size="152" font-weight="900" letter-spacing="1">dokan</text>
+</svg>
