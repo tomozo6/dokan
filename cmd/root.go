@@ -58,7 +58,7 @@ to remote hosts with the AWS System Manager session manager.`,
 		// RDSClientの生成
 		rdsClient, _ := aws.MakeRDSSVC(&profile)
 
-		// RDS&DocDBクラスタの情報が詰まったオブジェクトを生成
+		// RDSクラスタの情報が詰まったオブジェクトを生成
 		d, _ := aws.NewDBClusters(rdsClient)
 
 		// ユーザーに接続したいクラスタ名を選択させる
