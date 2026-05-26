@@ -1,26 +1,28 @@
 <p align="center">
-  <img src="./docs/logo.svg" alt="dokan logo" width="460" />
+  <img src="./docs/images/logo.png" alt="dokan logo" width="460" />
 </p>
 
 <p align="center">
-  AWS Systems Manager Session Manager 経由の接続を簡単にする、RDS/DocumentDB 向けポートフォワード CLI
+  AWS Systems Manager Session Manager 経由の接続を簡単にする、RDS 向けポートフォワード CLI
 </p>
 
 <p align="center">
   <a href="https://github.com/tomozo6/dokan/releases"><img src="https://img.shields.io/github/v/release/tomozo6/dokan?label=release" alt="release"></a>
   <a href="https://github.com/tomozo6/dokan/blob/main/LICENSE"><img src="https://img.shields.io/github/license/tomozo6/dokan" alt="license"></a>
-  <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.24%2B-00ADD8?logo=go" alt="go"></a>
+  <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.20%2B-00ADD8?logo=go" alt="go"></a>
 </p>
 
-## dokanとは
+# dokan
 
-`dokan` は、踏み台 EC2 を経由した RDS / DocumentDB への SSM ポートフォワードを対話形式で実行する CLI です。
+## 📖 dokanとは
+
+`dokan` は、踏み台 EC2 を経由した RDS への SSM ポートフォワードを対話形式で実行する CLI です。
 
 - AWS マネジメントコンソールを開かずに接続準備できる
 - 踏み台 EC2 と接続先 DB クラスタを対話で選択できる
 - `writer` / `reader` の接続先をフラグで切り替えられる
 
-## クイックスタート
+## ⚡ クイックスタート
 
 ```bash
 brew install tomozo6/tap/dokan
@@ -34,7 +36,7 @@ dokan
 
 デフォルトでは `reader` エンドポイントへ接続し、ローカルポートは DB ポートと同じ番号になります。
 
-## インストール
+## 📦 インストール
 
 ### Homebrew (macOS / Linux)
 
@@ -53,7 +55,7 @@ scoop install dokan
 
 [Releases](https://github.com/tomozo6/dokan/releases) からダウンロードできます。
 
-## 使い方
+## 🛠️ 使い方
 
 詳細は `dokan [command] --help` を参照してください。
 
@@ -68,7 +70,7 @@ dokan
 ### 主要オプション
 
 ```bash
-# writer インスタンスへ接続
+# writer インスタンスへトンネリング
 dokan --writer
 
 # AWS プロファイルを指定
@@ -87,7 +89,7 @@ dokan ec2login
 対話形式で EC2 を選択し、SSM Session Manager でログインします。
 (`bash` でログインするため、接続先に `bash` が必要です)
 
-## AWS 認証情報の参照順
+## 🔐 AWS 認証情報の参照順
 
 `dokan` は次の優先順で AWS プロファイルを解決します。
 
@@ -103,7 +105,7 @@ $env:AWS_DEFAULT_PROFILE = "your-profile"
 dokan
 ```
 
-## 前提条件
+## ✅ 前提条件
 
 ### Session Manager Plugin
 
@@ -115,8 +117,51 @@ dokan
 
 実行ユーザーには、少なくとも以下が必要です。
 
-- SSM セッション開始関連権限
-- EC2 情報参照権限
-- RDS / DocumentDB クラスタ情報参照権限
+- `ec2:DescribeInstances`
+- `rds:DescribeDBClusters`
+- `ssm:StartSession`
+- `ssm:TerminateSession`
 
-詳細ポリシー例は整備中です。
+最小構成のポリシー例:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DescribeResources",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "rds:DescribeDBClusters"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "StartSessionForBastionInstances",
+      "Effect": "Allow",
+      "Action": "ssm:StartSession",
+      "Resource": [
+        "arn:aws:ec2:ap-northeast-1:123456789012:instance/*",
+        "arn:aws:ssm:ap-northeast-1::document/AWS-StartPortForwardingSessionToRemoteHost",
+        "arn:aws:ssm:ap-northeast-1::document/AWS-StartInteractiveCommand"
+      ]
+    },
+    {
+      "Sid": "TerminateOwnSession",
+      "Effect": "Allow",
+      "Action": "ssm:TerminateSession",
+      "Resource": "arn:aws:ssm:ap-northeast-1:123456789012:session/*"
+    }
+  ]
+}
+```
+
+`ap-northeast-1` と `123456789012` は利用環境に合わせて置き換えてください。
+
+### `ec2login` 利用時の補足
+
+`dokan ec2login` の実行には、上記 IAM 権限に加えて接続先 EC2 側の SSM 要件も必要です。
+
+- 接続先 EC2 が Systems Manager のマネージドノードとして認識されていること
+- 接続先 EC2 のインスタンスロールに `AmazonSSMManagedInstanceCore` 相当の権限が付与されていること
