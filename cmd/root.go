@@ -25,7 +25,7 @@ created to facilitate port forwarding operations
 to remote hosts with the AWS System Manager session manager.`,
 	Version: Version,
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 
 		witerFlag, _ := cmd.Flags().GetBool("writer")
 		inputLocalPort, _ := cmd.Flags().GetInt32("port")
@@ -95,7 +95,7 @@ to remote hosts with the AWS System Manager session manager.`,
 		ssmClient, _ := aws.MakeSSMSVC(&profile)
 
 		// SSMを利用してポートフォワーディングをおこなう
-		aws.SSMPortForwarding(ssmClient, bastionID, dbHost, dbPort, localPort, region, &profile)
+		return aws.SSMPortForwarding(ssmClient, bastionID, dbHost, dbPort, localPort, region, &profile)
 	},
 }
 

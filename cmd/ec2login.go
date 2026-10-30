@@ -14,7 +14,7 @@ var ec2loginCmd = &cobra.Command{
 	Short: "ec2login",
 	Long:  "Login to EC2 securely using SSM Session Manager.",
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		profile = resolveProfile(profile)
 
 		// ec2Clientの生成及びリージョン名の取得
@@ -44,7 +44,7 @@ var ec2loginCmd = &cobra.Command{
 		ssmClient, _ := aws.MakeSSMSVC(&profile)
 
 		// SSMを利用してEC2にログインをおこなう
-		aws.SSMEC2Login(ssmClient, ec2ID, region, &profile)
+		return aws.SSMEC2Login(ssmClient, ec2ID, region, &profile)
 	},
 }
 
