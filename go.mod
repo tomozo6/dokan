@@ -1,6 +1,6 @@
 module github.com/tomozo6/dokan
 
-go 1.20
+go 1.27.3
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7

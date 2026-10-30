@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://github.com/tomozo6/dokan/releases"><img src="https://img.shields.io/github/v/release/tomozo6/dokan?label=release" alt="release"></a>
   <a href="https://github.com/tomozo6/dokan/blob/main/LICENSE"><img src="https://img.shields.io/github/license/tomozo6/dokan" alt="license"></a>
-  <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.20%2B-00ADD8?logo=go" alt="go"></a>
+  <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.27.3%2B-00ADD8?logo=go" alt="go"></a>
 </p>
 
 # dokan
@@ -88,6 +88,25 @@ dokan ec2login
 
 対話形式で EC2 を選択し、SSM Session Manager でログインします。
 (`bash` でログインするため、接続先に `bash` が必要です)
+
+## 開発環境
+
+Go のバージョンは [mise](https://mise.jdx.dev/) の `mise.toml` で管理しています。
+mise をインストールしたうえで、リポジトリのルートで以下を実行してください。
+
+```bash
+mise trust
+mise install
+mise exec -- go version
+mise exec -- go test ./...
+mise exec -- go build ./...
+```
+
+シェルで mise を有効化している場合は、`go` コマンドを直接実行できます。
+リリース CI も同じ `mise.toml` を使用します。
+
+Go を更新するときは、`mise.toml` の固定バージョンと `go.mod` の最低バージョン、
+この README のバッジを揃えて更新してください。
 
 ## 🔐 AWS 認証情報の参照順
 
