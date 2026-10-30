@@ -23,6 +23,13 @@ const (
 func runSSMSession(c *ssm.Client, input *ssm.StartSessionInput, region, profile string) (err error) {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 	defer stop()
+	defer func() {
+		// A handled interruption is expected. Joined cleanup or kill errors
+		// must still reach the CLI, even if they also contain context.Canceled.
+		if err == context.Canceled {
+			err = nil
+		}
+	}()
 
 	output, err := c.StartSession(ctx, input)
 	if err != nil {
@@ -70,6 +77,9 @@ func runSessionPlugin(ctx context.Context, cmd *exec.Cmd, grace time.Duration) e
 	go func() { done <- cmd.Wait() }()
 	select {
 	case err := <-done:
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
 		if err != nil {
 			return fmt.Errorf("session-manager-plugin: %w", err)
 		}

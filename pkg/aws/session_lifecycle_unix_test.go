@@ -103,7 +103,10 @@ func TestSessionProcessHelper(t *testing.T) {
 		}
 		return os.WriteFile(os.Getenv("DOKAN_SESSION_CLEANUP"), []byte("terminated"), 0600)
 	})
-	invokeTestSession(os.Getenv("DOKAN_SESSION_MODE"), c)
+	if err := invokeTestSession(os.Getenv("DOKAN_SESSION_MODE"), c); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(2)
+	}
 	os.Exit(0)
 }
 
@@ -149,7 +152,10 @@ func TestSessionInterruptReapsUnresponsivePlugin(t *testing.T) {
 		t.Fatal(err)
 	}
 	select {
-	case <-done:
+	case err := <-done:
+		if err != nil {
+			t.Errorf("Ctrl+C must finish without a command error: %v", err)
+		}
 	case <-time.After(8 * time.Second):
 		t.Fatal("dokan did not finish shutdown")
 	}

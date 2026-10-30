@@ -18,8 +18,9 @@ var (
 var profile string
 
 var rootCmd = &cobra.Command{
-	Use:   "dokan",
-	Short: "dokan",
+	Use:          "dokan",
+	Short:        "dokan",
+	SilenceUsage: true,
 	Long: `dokan is a CLI tool
 created to facilitate port forwarding operations
 to remote hosts with the AWS System Manager session manager.`,
